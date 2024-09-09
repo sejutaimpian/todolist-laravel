@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{isDark: $persist(false)}"
+    :class="{'dark': isDark}">
 
 <head>
     <meta charset="utf-8">
@@ -19,7 +20,8 @@
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
+<body class="grid text-gray-900 bg-white place-content-center dark:bg-gray-900 dark:text-gray-100"
+    @keyup.ctrl.shift.l='isDark = !isDark'>
     {{ $slot }}
 </body>
 

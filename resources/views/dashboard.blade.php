@@ -139,7 +139,53 @@
                     confirmButtonText: 'Ok'
                 })
             }
-        }
+        },
+        isShowModal: false,
+        todoData: {
+            id: null,
+            title: '',
+            description: '',
+            is_completed: null,
+            user_id: {{ auth()->user()->id }}
+        },
+        editTodo(todo) {
+            this.todoData.id = todo.id
+            this.todoData.title = todo.title
+            this.todoData.description = todo.description
+            this.todoData.is_completed = todo.is_completed
+            this.isShowModal = true
+        },
+        async updateTodo() {
+            const response = await fetch('/todo/' + this.todoData.id, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ @csrf_token() }}'
+                },
+                body: JSON.stringify(this.todoData)
+            })
+            if (response.ok) {
+                this.allTodos = this.allTodos.map(todo => {
+                    if (todo.id === this.todoData.id) {
+                        return this.todoData
+                    } else {
+                        return todo
+                    }
+                })
+                this.isShowModal = false
+                Swal.fire({
+                    title: 'Todo has been updated',
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                })
+            } else {
+                Swal.fire({
+                    title: 'Todo not updated',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                })
+            }
+        },
     }">
         <div class="flex-1 overflow-y-auto h-svh no-scrollbar">
             <h1 class="my-4">Todolist</h1>
@@ -163,8 +209,15 @@
                     <span id="todoDescription" class="mt-2 ml-6 text-slate-700 dark:text-slate-300"
                         x-text="todo.description">
                     </span>
-                    <div class="flex mt-3">
-                        <button type="button" @click='deleteTodo(todo.id)'>Delete</button>
+                    <div class="flex justify-end w-full mt-3 gap-x-4">
+                        <button type="button" @click='deleteTodo(todo.id)'
+                            class="px-2 py-1 text-red-500 rounded-md dark:hover:bg-red-950 hover:bg-red-50 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50">
+                            Delete
+                        </button>
+                        <button type="button" @click='editTodo(todo)'
+                            class="px-2 py-1 rounded-md text-amber-500 dark:hover:bg-amber-950 hover:bg-amber-50 focus:outline-none focus:ring focus:ring-amber-300 focus:ring-opacity-50">
+                            Edit
+                        </button>
                     </div>
                 </div>
             </template>
@@ -179,6 +232,7 @@
                     },
                     isShow: false
                 }">
+
                 <button type="button" @click="isShow = !isShow"
                     class="w-1/2 px-6 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
                     Add Todo
@@ -225,11 +279,42 @@
                         </div>
                         <h3 class="line-through" x-text="todo.title"></h3>
                     </label>
-                    <div class="flex mt-3">
-                        <button type="button" @click='deleteTodo(todo.id)'>Delete</button>
+                    <div class="flex justify-end w-full mt-3">
+                        <button type="button" @click='deleteTodo(todo.id)'
+                            class="px-2 py-1 text-red-500 rounded-md dark:hover:bg-red-950 hover:bg-red-50 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50">
+                            Delete
+                        </button>
                     </div>
                 </div>
             </template>
+        </div>
+
+        <div id="modal"
+            class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 overflow-hidden bg-gray-900/50 sm:px-6 sm:py-24 md:px-20 md:py-32"
+            x-show="isShowModal" x-cloak>
+            <form @submit.prevent="updateTodo(); isShow=false" @click.outside="isShowModal = false"
+                class="w-full max-w-xl p-10 my-4 space-y-4 bg-white rounded-lg shadow-lg dark:bg-black">
+                <div>
+                    <label for="title" class="block text-gray-500 dark:text-gray-300">Title</label>
+                    <input required type="text" placeholder="Title" x-model="todoData.title"
+                        class="block  mt-2 w-full placeholder-gray-400/70 dark:placeholder-gray-500 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300" />
+                </div>
+                <div>
+                    <label for="description" class="block text-gray-500 dark:text-gray-300">Description</label>
+                    <textarea required x-model="todoData.description" placeholder="Description" rows="auto"
+                        class="block  mt-2 w-full placeholder-gray-400/70 dark:placeholder-gray-500 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300"></textarea>
+                </div>
+                <div class="flex justify-between gap-x-6">
+                    <button type="button" @click="isShowModal = false"
+                        class="w-1/2 px-6 py-2 font-medium tracking-wide capitalize transition-colors duration-300 transform rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
+                        Cancel
+                    </button>
+                    <button
+                        class="w-1/2 px-6 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
+                        Update Todo
+                    </button>
+                </div>
+            </form>
         </div>
     </main>
 </x-app-layout>

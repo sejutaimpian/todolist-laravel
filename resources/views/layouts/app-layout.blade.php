@@ -20,7 +20,7 @@
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 
-<body class="grid text-gray-900 bg-white place-content-center dark:bg-gray-900 dark:text-gray-100"
+<body class="flex justify-center text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100"
     @keyup.ctrl.shift.l='isDark = !isDark'>
     {{ $slot }}
 </body>

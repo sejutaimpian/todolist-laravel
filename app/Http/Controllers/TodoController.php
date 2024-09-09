@@ -60,6 +60,12 @@ class TodoController extends Controller
     {
         //
     }
+    public function toggleTodo(Todo $todo)
+    {
+        $todo->is_completed = !$todo->is_completed;
+        $result = $todo->save();
+        return response()->json($result);
+    }
 
     /**
      * Remove the specified resource from storage.

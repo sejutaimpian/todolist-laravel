@@ -123,6 +123,22 @@
                     confirmButtonText: 'Ok'
                 })
             }
+        },
+        async toggleTodo(id) {
+            const response = await fetch('/toggletodo/' + id, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ @csrf_token() }}'
+                }
+            })
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Todo has been updated',
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                })
+            }
         }
     }">
         <div class="flex-1 overflow-y-auto h-svh no-scrollbar">
@@ -132,7 +148,7 @@
                     <label x-bind:for="'todo-' + todo.id"
                         class="flex cursor-pointer items-center gap-2 font-medium text-slate-700 dark:text-slate-300 [&:has(input:checked)]:text-black dark:[&:has(input:checked)]:text-white [&:has(input:disabled)]:opacity-75 [&:has(input:disabled)]:cursor-not-allowed">
                         <div class="relative flex items-center">
-                            <input x-bind:id="'todo-' + todo.id" type="checkbox"
+                            <input x-bind:id="'todo-' + todo.id" type="checkbox" @click='toggleTodo(todo.id)'
                                 class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-slate-300 bg-slate-100 before:absolute before:inset-0 checked:border-blue-700 checked:before:bg-blue-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800 checked:focus:outline-blue-700 active:outline-offset-0 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:checked:border-blue-600 dark:checked:before:bg-blue-600 dark:focus:outline-slate-300 dark:checked:focus:outline-blue-600"
                                 aria-describedby="todoDescription" x-model="todo.is_completed"
                                 x-bind:checked="todo.is_completed" />
@@ -197,7 +213,7 @@
                     <label x-bind:for="'todo-' + todo.id"
                         class="flex cursor-pointer items-center gap-2 font-medium text-slate-700 dark:text-slate-300 [&:has(input:checked)]:text-black dark:[&:has(input:checked)]:text-white [&:has(input:disabled)]:opacity-75 [&:has(input:disabled)]:cursor-not-allowed">
                         <div class="relative flex items-center">
-                            <input x-bind:id="'todo-' + todo.id" type="checkbox"
+                            <input x-bind:id="'todo-' + todo.id" type="checkbox" @click='toggleTodo(todo.id)'
                                 class="before:content[''] peer relative size-4 cursor-pointer appearance-none overflow-hidden rounded border border-slate-300 bg-slate-100 before:absolute before:inset-0 checked:border-blue-700 checked:before:bg-blue-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-slate-800 checked:focus:outline-blue-700 active:outline-offset-0 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:checked:border-blue-600 dark:checked:before:bg-blue-600 dark:focus:outline-slate-300 dark:checked:focus:outline-blue-600"
                                 aria-describedby="todoDescription" x-model="todo.is_completed"
                                 x-bind:checked="todo.is_completed" />
